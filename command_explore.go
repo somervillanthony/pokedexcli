@@ -11,7 +11,7 @@ import (
 
 func commandExplore(cfg *config, args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("explore needs at least one additional parameter")
+		return fmt.Errorf("explore needs at least one additional parameter\n")
 	}
 	url := "https://pokeapi.co/api/v2/location-area/" + args[0]
 

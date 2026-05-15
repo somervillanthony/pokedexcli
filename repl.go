@@ -7,12 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/somervillanthony/pokedexcli/internal/pokeapi"
 	"github.com/somervillanthony/pokedexcli/internal/pokecache"
 )
 
 func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
 	cfg := &config{}
+	cfg.pokedex = map[string]pokeapi.PokemonData{}
 	cfg.cache = pokecache.NewCache(5 * time.Second)
 
 	for {
@@ -54,6 +56,7 @@ type config struct {
 	Next     *string
 	Previous *string
 	cache    *pokecache.Cache
+	pokedex  map[string]pokeapi.PokemonData
 }
 
 func getCommands() map[string]cliCommand {
@@ -82,6 +85,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "Find pokemon types in a location area name",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attempt to catch a pokemon",
+			callback:    commandCatch,
 		},
 	}
 }

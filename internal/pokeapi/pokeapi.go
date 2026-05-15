@@ -62,3 +62,9 @@ type LocationAreaExplore struct {
 		} `json:"version_details"`
 	} `json:"pokemon_encounters"`
 }
+
+type PokemonData struct {
+	ID             int    `json:"id"`
+	Name           string `json:"name"`
+	BaseExperience int    `json:"base_experience"`
+}
