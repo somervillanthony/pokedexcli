@@ -1,7 +1,6 @@
 package pokecache
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -41,8 +40,6 @@ func (c *Cache) Add(key string, val []byte) {
 		createdAt: time.Now(),
 		val:       val,
 	}
-	fmt.Println("below is val []bytes")
-	fmt.Println(entry.val)
 	c.cache[key] = entry
 }
 

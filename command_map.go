@@ -9,7 +9,7 @@ import (
 	"github.com/somervillanthony/pokedexcli/internal/pokeapi"
 )
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, args []string) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 	if cfg.Next != nil {
 		url = *cfg.Next
@@ -38,8 +38,6 @@ func commandMap(cfg *config) error {
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
 		cfg.cache.Add(url, toBeCached)
-		fmt.Println("below is url")
-		fmt.Println(url)
 	}
 
 	cfg.Next = locationAreaData.Next
@@ -52,7 +50,7 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, args []string) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 	if cfg.Previous != nil {
 		url = *cfg.Previous

@@ -27,7 +27,7 @@ func startRepl() {
 
 		command, ok := commands[inputSlice[0]]
 		if ok {
-			err := command.callback(cfg)
+			err := command.callback(cfg, inputSlice[1:])
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -46,7 +46,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(cfg *config) error
+	callback    func(cfg *config, args []string) error
 	config      *config
 }
 
