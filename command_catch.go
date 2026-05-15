@@ -12,7 +12,7 @@ import (
 
 func commandCatch(cfg *config, args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("catch needs at least one additional parameter\n")
+		return fmt.Errorf("catch needs at least one additional parameter")
 	}
 	url := "https://pokeapi.co/api/v2/pokemon/" + args[0]
 
