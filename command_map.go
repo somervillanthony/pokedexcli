@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 
 	"github.com/somervillanthony/pokedexcli/internal/pokeapi"
 )
@@ -12,9 +15,31 @@ func commandMap(cfg *config) error {
 		url = *cfg.Next
 	}
 
-	locationAreaData, err := pokeapi.UnmarshalJson(url)
-	if err != nil {
-		return err
+	var locationAreaData pokeapi.LocationAreas
+
+	cachedInfo, ok := cfg.cache.Get(url)
+	if ok {
+		err := json.Unmarshal(cachedInfo, &locationAreaData)
+		if err != nil {
+			return fmt.Errorf("Failed to Unmarshal cached json info: %w", err)
+		}
+	} else {
+		res, err := http.Get(url)
+		if err != nil {
+			return fmt.Errorf("HTTP GET failed: %w", err)
+		}
+		defer res.Body.Close()
+		toBeCached, err := io.ReadAll(res.Body)
+		if err != nil {
+			return fmt.Errorf("io readall to get json data to cache failed: %w", err)
+		}
+		err = json.Unmarshal(toBeCached, &locationAreaData)
+		if err != nil {
+			return fmt.Errorf("failed to decode json: %w", err)
+		}
+		cfg.cache.Add(url, toBeCached)
+		fmt.Println("below is url")
+		fmt.Println(url)
 	}
 
 	cfg.Next = locationAreaData.Next
@@ -35,9 +60,30 @@ func commandMapb(cfg *config) error {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	locationAreaData, err := pokeapi.UnmarshalJson(url)
-	if err != nil {
-		return err
+
+	var locationAreaData pokeapi.LocationAreas
+
+	cachedInfo, ok := cfg.cache.Get(url)
+	if ok {
+		err := json.Unmarshal(cachedInfo, &locationAreaData)
+		if err != nil {
+			return fmt.Errorf("Failed to Unmarshal cached json info: %w", err)
+		}
+	} else {
+		res, err := http.Get(url)
+		if err != nil {
+			return fmt.Errorf("HTTP GET failed: %w", err)
+		}
+		defer res.Body.Close()
+		toBeCached, err := io.ReadAll(res.Body)
+		if err != nil {
+			return fmt.Errorf("io readall to get json data to cache failed: %w", err)
+		}
+		err = json.Unmarshal(toBeCached, &locationAreaData)
+		if err != nil {
+			return fmt.Errorf("failed to decode json: %w", err)
+		}
+		cfg.cache.Add(url, toBeCached)
 	}
 
 	cfg.Next = locationAreaData.Next

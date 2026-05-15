@@ -1,13 +1,15 @@
 package pokecache
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
 
 type Cache struct {
-	cache map[string]cacheEntry
-	mu    sync.Mutex
+	cache    map[string]cacheEntry
+	mu       sync.Mutex
+	interval time.Duration
 }
 
 type cacheEntry struct {
@@ -16,18 +18,20 @@ type cacheEntry struct {
 }
 
 func NewCache(interval time.Duration) *Cache {
-	newCache := Cache{
-		cache: map[string]cacheEntry{},
-		mu:    sync.Mutex{},
+	c := &Cache{
+		cache:    map[string]cacheEntry{},
+		mu:       sync.Mutex{},
+		interval: interval,
 	}
-	ticker := time.NewTicker(interval * time.Second)
-	defer ticker.Stop()
+	ticker := time.NewTicker(c.interval)
+
 	go func() {
+		defer ticker.Stop()
 		for range ticker.C {
-			newCache.reapLoop()
+			c.reapLoop()
 		}
 	}()
-	return &newCache
+	return c
 }
 
 func (c *Cache) Add(key string, val []byte) {
@@ -37,6 +41,8 @@ func (c *Cache) Add(key string, val []byte) {
 		createdAt: time.Now(),
 		val:       val,
 	}
+	fmt.Println("below is val []bytes")
+	fmt.Println(entry.val)
 	c.cache[key] = entry
 }
 
@@ -50,4 +56,13 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	return nil, false
 }
 
-func (c *Cache) reapLoop()
+func (c *Cache) reapLoop() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for key, val := range c.cache {
+		elapsed := time.Since(val.createdAt)
+		if elapsed >= c.interval {
+			delete(c.cache, key)
+		}
+	}
+}
